@@ -1,9 +1,13 @@
 from baseball_metrics import Handedness, Player
 from fastapi import FastAPI, Query
 from glob import glob
+from loguru import logger
 from typing import Literal
 
 import datetime
+
+
+logger.add("server.log", rotation="100 MB")
 
 
 def get_all_players() -> dict[str, Player]:
@@ -36,7 +40,13 @@ def call_metric_on_player(
         args = [start_date.year]
 
     f = getattr(player, metric)
-    value = f(*args)
+
+    try:
+        value = f(*args)
+    except Exception as e:
+        logger.exception(f"Request for metric {metric} on player {player.id} from {start_date} to {end_date} failed")
+        return None
+
     if isinstance(value, Handedness):
         handednesses = {
             Handedness.LEFT: "Left",

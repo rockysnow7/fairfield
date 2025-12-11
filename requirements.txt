@@ -1,2 +1,3 @@
 fastapi[standard]
 baseball_metrics @ git+https://github.com/rockysnow7/baseball-metrics.git
+loguru
